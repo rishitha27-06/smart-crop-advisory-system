@@ -124,16 +124,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     const loadDashboardData = async () => {
-      if (!state.user) return;
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        if (!token) {
-          toast({ title: "Auth Error", description: "Login again", variant: "destructive" });
-          navigate('/login');
-          return;
-        }
-        // Mock data for crops and orders
+        
+        // Load data without authentication checks
         const cropsData = [
           { id: '1', name: 'Wheat', quantity: 100, price: 2200, location: 'Delhi', harvestDate: '2023-12-01', photos: [], farmerId: 'demo-id', farmerName: 'Demo Farmer', createdAt: new Date().toISOString() },
           { id: '2', name: 'Rice', quantity: 50, price: 1850, location: 'Hyderabad', harvestDate: '2023-11-15', photos: [], farmerId: 'demo-id', farmerName: 'Demo Farmer', createdAt: new Date().toISOString() }
@@ -153,7 +147,7 @@ const Dashboard = () => {
 
     loadDashboardData();
     updateDataBasedOnLocation(selectedLocation);
-  }, [state.user, toast, navigate]);
+  }, [toast]); // Removed state.user and navigate dependencies
 
   useEffect(() => {
     updateDataBasedOnLocation(selectedLocation);
@@ -175,7 +169,7 @@ const Dashboard = () => {
 
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-green-700">{t('dashboard.welcome')}, {state.user?.name}!</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-green-700">{t('dashboard.welcome')}, Demo User!</h1>
           <div className="flex items-center space-x-4">
             <Select value={selectedLocation} onValueChange={setSelectedLocation}>
               <SelectTrigger className="w-32">

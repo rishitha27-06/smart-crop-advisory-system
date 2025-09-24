@@ -38,16 +38,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
 
-    // ✅ fallback: require login for crops/machinery
-    if (!state.isLoggedIn) {
-      toast({
-        title: "Login Required",
-        description: "Please login to add items to your cart",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       await addItem({ id, name, price, image, category });
       toast({

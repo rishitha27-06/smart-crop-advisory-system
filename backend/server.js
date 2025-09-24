@@ -113,14 +113,35 @@ process.on('unhandledRejection', (err) => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
-  console.log(`
+// Enhanced server startup with better error handling
+const startServer = () => {
+  try {
+    server.listen(PORT, () => {
+      console.log(`
 🚀 Smart Kisan Shakti Backend Server is running!
 📍 Port: ${PORT}
 🌍 Environment: ${process.env.NODE_ENV || 'development'}
 📊 Health Check: http://localhost:${PORT}/api/health
 🌤️ Weather API: http://localhost:${PORT}/api/weather/current
-  `);
-});
+🔧 CORS Origins: ${process.env.FRONTEND_URL || 'http://localhost:5173'}
+      `);
+    });
+
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use. Please try a different port.`);
+        process.exit(1);
+      } else {
+        console.error('❌ Server error:', err);
+        process.exit(1);
+      }
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export { io };

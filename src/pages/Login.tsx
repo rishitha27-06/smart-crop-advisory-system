@@ -32,15 +32,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    // Accept any credentials - no validation required
     setIsLoading(true);
 
     try {
@@ -65,14 +57,15 @@ const Login = () => {
       } else {
         toast({
           title: "Error",
-          description: "Invalid credentials ❌",
+          description: "Login failed - please try again",
           variant: "destructive",
         });
       }
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Server connection failed ❌",
+        description: error.response?.data?.message || "Server connection failed - please check your connection and try again",
         variant: "destructive",
       });
     } finally {

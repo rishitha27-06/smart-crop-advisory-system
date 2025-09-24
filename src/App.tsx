@@ -52,30 +52,9 @@ const App = () => (
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/advisory-chat"
-                    element={
-                      <ProtectedRoute>
-                        <AdvisoryChat />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/pest-detection"
-                    element={
-                      <ProtectedRoute>
-                        <PestDetection />
-                      </ProtectedRoute>
-                    }
-                  />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/advisory-chat" element={<AdvisoryChat />} />
+                  <Route path="/pest-detection" element={<PestDetection />} />
                   <Route path="/feedback" element={<Feedback />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/order-summary" element={<OrderSummary />} />

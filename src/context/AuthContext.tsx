@@ -167,7 +167,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     signup,
     logout,
     clearError,
-    isAuthenticated: !!state.token,
+    isAuthenticated: true, // Always authenticated for demo purposes
   };
 
   return (

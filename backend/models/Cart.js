@@ -33,8 +33,11 @@ const cartItemSchema = new mongoose.Schema({
 const cartSchema = new mongoose.Schema({
   userId: {
     type: String, // Use String type to handle both ObjectId strings and demo user strings
-    required: true,
-    unique: true
+    required: false
+  },
+  guestId: {
+    type: String, // For guest users, use session ID or generated ID
+    required: false
   },
   items: [cartItemSchema]
 }, {

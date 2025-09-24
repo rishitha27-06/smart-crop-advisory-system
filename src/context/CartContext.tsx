@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import api from '@/lib/api';
-import { useAuth } from './AuthContext';
 
 export interface CartItem {
   id: string;
@@ -14,7 +13,6 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   total: number;
-  isLoggedIn: boolean;
   loading: boolean;
 }
 
@@ -23,15 +21,12 @@ type CartAction =
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
   | { type: 'CLEAR_CART' }
-  | { type: 'LOGIN' }
-  | { type: 'LOGOUT' }
   | { type: 'SET_CART'; payload: CartItem[] }
   | { type: 'SET_LOADING'; payload: boolean };
 
 const initialState: CartState = {
   items: [],
   total: 0,
-  isLoggedIn: false,
   loading: false,
 };
 
@@ -75,12 +70,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'CLEAR_CART':
       return { ...state, items: [], total: 0 };
 
-    case 'LOGIN':
-      return { ...state, isLoggedIn: true };
-
-    case 'LOGOUT':
-      return { ...state, isLoggedIn: false, items: [], total: 0 };
-
     case 'SET_CART':
       const total = action.payload.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       return { ...state, items: action.payload, total };
@@ -99,8 +88,6 @@ interface CartContextType {
   removeItem: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
-  login: () => void;
-  logout: () => void;
   fetchCart: () => Promise<void>;
   getCartItemCount: () => number;
 }
@@ -109,7 +96,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
-  const { state: authState } = useAuth();
 
   const fetchCart = async () => {
     try {
@@ -170,34 +156,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const login = () => {
-    dispatch({ type: 'LOGIN' });
-    fetchCart(); // Fetch cart when user logs in
-  };
-
-  const logout = () => {
-    dispatch({ type: 'LOGOUT' });
-  };
-
-  // Sync with AuthContext
-  useEffect(() => {
-    if (authState.token) {
-      dispatch({ type: 'LOGIN' });
-      fetchCart();
-    } else {
-      dispatch({ type: 'LOGOUT' });
-    }
-  }, [authState.token]);
-
   const getCartItemCount = () => {
     return state.items.reduce((total, item) => total + item.quantity, 0);
   };
 
+  // Initialize cart on mount
   useEffect(() => {
-    if (state.isLoggedIn) {
-      fetchCart();
-    }
-  }, [state.isLoggedIn]);
+    fetchCart();
+  }, []);
 
   return (
     <CartContext.Provider value={{
@@ -206,8 +172,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       removeItem,
       updateQuantity,
       clearCart,
-      login,
-      logout,
       fetchCart,
       getCartItemCount,
     }}>

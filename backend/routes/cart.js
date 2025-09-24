@@ -1,5 +1,5 @@
 import express from 'express';
-import { protect } from '../middleware/auth.js';
+import { optionalAuth } from '../middleware/auth.js';
 import {
   getCart,
   addToCart,
@@ -10,8 +10,8 @@ import {
 
 const router = express.Router();
 
-// All routes require authentication
-router.use(protect);
+// Optional authentication - routes work with or without login
+router.use(optionalAuth);
 
 router.get('/', getCart);
 router.post('/add', addToCart);

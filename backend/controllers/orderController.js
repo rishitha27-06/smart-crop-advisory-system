@@ -3,13 +3,14 @@ import Order from '../models/Order.js';
 
 // @desc    Place order from cart
 // @route   POST /api/orders
-// @access  Private
+// @access  Public
 export const placeOrder = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
     const { shippingAddress, paymentMethod } = req.body;
 
-    const cart = await Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({
@@ -27,6 +28,7 @@ export const placeOrder = async (req, res) => {
     // Create order with cart items and additional data from frontend
     const order = await Order.create({
       userId: userId,
+      guestId: userId ? null : guestId,
       orderNumber: orderNumber,
       items: cart.items,
       totalAmount,
@@ -57,10 +59,13 @@ export const placeOrder = async (req, res) => {
 
 // @desc    Get user's orders
 // @route   GET /api/orders
-// @access  Private
+// @access  Public
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
+
+    const orders = await Order.find({ $or: [{ userId: userId }, { guestId: guestId }] }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -77,10 +82,13 @@ export const getOrders = async (req, res) => {
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
-// @access  Private
+// @access  Public
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findOne({ _id: req.params.id, userId: req.user.id });
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
+
+    const order = await Order.findOne({ _id: req.params.id, $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!order) {
       return res.status(404).json({

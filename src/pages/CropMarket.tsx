@@ -171,15 +171,6 @@ const CropMarket = () => {
                 <Button
                   className="mt-3 w-full flex items-center gap-2"
                   onClick={async () => {
-                    if (!state.isLoggedIn) {
-                      toast({
-                        title: "Login Required",
-                        description: "Please login to add items to your cart",
-                        variant: "destructive",
-                      });
-                      return;
-                    }
-
                     try {
                       await addItem({
                         id: crop.id,

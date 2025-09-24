@@ -10,14 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, CreditCard, Truck, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 
 const Checkout = () => {
   const { state: cartState, clearCart } = useCart();
-  const { state: authState } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -39,16 +37,6 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!authState.user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please login to place an order",
-        variant: "destructive",
-      });
-      navigate('/login');
-      return;
-    }
-
     if (cartState.items.length === 0) {
       toast({
         title: "Cart is Empty",

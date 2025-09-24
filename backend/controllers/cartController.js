@@ -4,15 +4,20 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 
 // @desc    Get user's cart
 // @route   GET /api/cart
-// @access  Private
+// @access  Public
 export const getCart = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
 
-    let cart = await Cart.findOne({ userId: userId });
+    let cart = await Cart.findOne({ $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!cart) {
-      cart = await Cart.create({ userId: userId, items: [] });
+      cart = await Cart.create({
+        userId: userId,
+        guestId: userId ? null : guestId,
+        items: []
+      });
     }
 
     res.status(200).json({
@@ -30,16 +35,21 @@ export const getCart = async (req, res) => {
 
 // @desc    Add item to cart
 // @route   POST /api/cart/add
-// @access  Private
+// @access  Public
 export const addToCart = async (req, res) => {
   try {
     const { productId, productType, name, price, image, quantity = 1 } = req.body;
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
 
-    let cart = await Cart.findOne({ userId: userId });
+    let cart = await Cart.findOne({ $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!cart) {
-      cart = await Cart.create({ userId: userId, items: [] });
+      cart = await Cart.create({
+        userId: userId,
+        guestId: userId ? null : guestId,
+        items: []
+      });
     }
 
     // Check if item already exists in cart
@@ -77,13 +87,14 @@ export const addToCart = async (req, res) => {
 
 // @desc    Remove item from cart
 // @route   DELETE /api/cart/:productId
-// @access  Private
+// @access  Public
 export const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
 
-    const cart = await Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!cart) {
       return res.status(404).json({
@@ -112,14 +123,15 @@ export const removeFromCart = async (req, res) => {
 
 // @desc    Update item quantity in cart
 // @route   PUT /api/cart/:productId
-// @access  Private
+// @access  Public
 export const updateCartItem = async (req, res) => {
   try {
     const { productId } = req.params;
     const { quantity } = req.body;
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
 
-    const cart = await Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!cart) {
       return res.status(404).json({
@@ -157,12 +169,13 @@ export const updateCartItem = async (req, res) => {
 
 // @desc    Clear cart
 // @route   DELETE /api/cart
-// @access  Private
+// @access  Public
 export const clearCart = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
+    const guestId = req.sessionID || `guest-${Date.now()}`;
 
-    const cart = await Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ $or: [{ userId: userId }, { guestId: guestId }] });
 
     if (!cart) {
       return res.status(404).json({
