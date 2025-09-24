@@ -135,16 +135,16 @@ const Home = () => {
                 </span>
               </motion.div>
 
-              <h1 className="text-2xl lg:text-3xl font-bold text-primary-foreground mb-6 leading-tight">
-                <span className="block">Smart</span>
-                <span className="block text-white">Crop Advisory System</span>
+              <h1 className="text-2xl lg:text-4xl font-bold text-primary-foreground mb-6 leading-tight">
+                <span className="block bg-gradient-to-r from-white to-primary-foreground/80 bg-clip-text text-transparent">Smart</span>
+                <span className="block text-white font-semibold">Crop Advisory System</span>
               </h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-2xl lg:text-3xl text-primary-foreground/90 mb-6 font-light"
+                className="text-lg lg:text-2xl text-primary-foreground/90 mb-6 font-light"
               >
                 {t('home.hero.subtitle')}
               </motion.p>
@@ -153,7 +153,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="text-xl text-primary-foreground/80 mb-10 max-w-2xl leading-relaxed"
+                className="text-base lg:text-lg text-primary-foreground/85 mb-8 max-w-2xl leading-relaxed"
               >
                 {t('home.hero.description')}
               </motion.p>
@@ -165,14 +165,14 @@ const Home = () => {
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               >
                 <Link to="/features">
-                  <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                  <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105 rounded-full">
                     <Sparkles className="mr-2 h-5 w-5" />
                     {t('home.hero.exploreFeatures')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/crop-market">
-                  <Button variant="agriculture" size="lg" className="px-8 py-4 text-lg font-semibold">
+                  <Button variant="agriculture" size="lg" className="px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                     <TrendingUp className="mr-2 h-5 w-5" />
                     {t('home.hero.viewCropMarket')}
                   </Button>
@@ -194,10 +194,6 @@ const Home = () => {
                   <div className="text-3xl font-bold text-primary-foreground">50K+</div>
                   <div className="text-sm text-primary-foreground/70">Crops Traded</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-foreground">95%</div>
-                  <div className="text-sm text-primary-foreground/70">Success Rate</div>
-                </div>
               </motion.div>
             </motion.div>
 
@@ -211,44 +207,9 @@ const Home = () => {
                 <img
                   src={heroImage}
                   alt="Modern Agriculture"
-                  className="rounded-3xl shadow-2xl w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
+                  className="rounded-3xl shadow-2xl w-full h-[600px] object-cover transform hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-primary/30 to-transparent"></div>
-
-                {/* Enhanced Floating Cards */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.2 }}
-                  className="absolute -bottom-6 -left-6 bg-primary-foreground/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground">AI-Powered</div>
-                      <div className="text-sm text-muted-foreground">Smart Solutions</div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, y: -20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.4 }}
-                  className="absolute -top-6 -right-6 bg-primary-foreground/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-shadow"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <TrendingUp className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground text-sm">95% Success</div>
-                      <div className="text-xs text-muted-foreground">Rate</div>
-                    </div>
-                  </div>
-                </motion.div>
 
                 {/* Image Overlay Effects */}
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-transparent via-transparent to-primary/10 pointer-events-none"></div>
@@ -301,11 +262,11 @@ const Home = () => {
               <span className="text-sm font-semibold text-primary">Powerful Features</span>
             </motion.div>
 
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
               Everything You Need to
-              <span className="block gradient-text">Succeed in Farming</span>
+              <span className="block bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">Succeed in Farming</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               {t('home.features.description')}
             </p>
           </motion.div>
@@ -416,10 +377,10 @@ const Home = () => {
               <span className="text-sm font-semibold text-primary-foreground">AI-Powered Intelligence</span>
             </motion.div>
 
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
               {t('home.aiFeatures.title')}
             </h2>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               {t('home.aiFeatures.description')}
             </p>
           </motion.div>
@@ -524,10 +485,10 @@ const Home = () => {
               <span className="text-sm font-semibold text-primary">Customer Stories</span>
             </motion.div>
 
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
               What Our Farmers Say
             </h2>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               Join thousands of successful farmers who trust Smart Crop Advisory System
             </p>
           </motion.div>
@@ -638,10 +599,10 @@ const Home = () => {
               <span className="text-sm font-semibold text-primary">Quick Access</span>
             </motion.div>
 
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
               {t('home.quickAccess.title')}
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               {t('home.quickAccess.description')}
             </p>
           </motion.div>
@@ -775,16 +736,16 @@ const Home = () => {
               <span className="text-sm font-semibold text-primary-foreground">Join Now</span>
             </motion.div>
 
-            <h2 className="text-4xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-6 leading-tight">
               Ready to Transform Your
-              <span className="block">Farming Journey?</span>
+              <span className="block bg-gradient-to-r from-primary-foreground to-white bg-clip-text text-transparent">Farming Journey?</span>
             </h2>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-2xl text-primary-foreground/90 mb-12 max-w-4xl mx-auto leading-relaxed font-light"
+              className="text-lg lg:text-xl text-primary-foreground/90 mb-10 max-w-4xl mx-auto leading-relaxed"
             >
               Join thousands of farmers who are already using Smart Kisan Shakti
               to grow their agricultural business with cutting-edge technology.
@@ -797,14 +758,14 @@ const Home = () => {
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
               <Link to="/login">
-                <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-12 py-6 text-xl font-bold shadow-2xl hover:shadow-primary-foreground/25 transition-all duration-300 transform hover:scale-105">
+                <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-10 py-5 text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-full">
                   <Sparkles className="mr-3 h-6 w-6" />
                   Get Started Free
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button variant="agriculture" size="lg" className="px-12 py-6 text-xl font-bold border-2 border-primary-foreground/30 hover:border-primary-foreground/50 transition-all transform hover:scale-105">
+                <Button variant="agriculture" size="lg" className="px-10 py-5 text-xl font-bold border-2 border-primary-foreground/30 hover:border-primary-foreground/50 transition-all transform hover:scale-105 rounded-full shadow-lg hover:shadow-xl">
                   <MessageSquare className="mr-3 h-6 w-6" />
                   Contact Us
                 </Button>

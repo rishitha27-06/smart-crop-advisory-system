@@ -1,5 +1,6 @@
 import Cart from '../models/Cart.js';
 import mongoose from 'mongoose';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 // @desc    Get user's cart
 // @route   GET /api/cart

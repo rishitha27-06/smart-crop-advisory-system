@@ -51,19 +51,18 @@ export const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // ✅ Hardcoded demo login
-  if (email.toLowerCase() === 'demo@gmail.com' && password === '123456') {
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful (Demo User)',
-      token: 'demo-token-123',
-      user: DEMO_USER
-    });
-  }
+  // ✅ Accept any credentials for login
+  const user = {
+    ...DEMO_USER,
+    email: email,
+    name: email.split('@')[0] || 'User', // Use part before @ as name
+  };
 
-  return res.status(401).json({
-    success: false,
-    message: 'Invalid credentials. Use demo@gmail.com / 123456'
+  return res.status(200).json({
+    success: true,
+    message: 'Login successful',
+    token: 'demo-token-123',
+    user: user
   });
 });
 

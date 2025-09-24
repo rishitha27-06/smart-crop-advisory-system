@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Leaf, LogOut, BarChart3, CloudRain, Sun, Thermometer } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Leaf, LogOut, BarChart3, CloudRain, Sun, Thermometer, MapPin, Droplets, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { apiClient, Crop, Order } from '@/lib/api-fixed';
@@ -24,6 +25,102 @@ const Dashboard = () => {
   const [soilHealth, setSoilHealth] = useState<any>(null);
   const [marketPrices, setMarketPrices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLocation, setSelectedLocation] = useState('Mumbai');
+
+  const updateDataBasedOnLocation = async (location: string) => {
+    try {
+      const [weatherData, forecastData, weatherAlerts] = await Promise.all([
+        getCurrentWeather(location, 'IN'),
+        getWeatherForecast(location, 'IN'),
+        getWeatherAlerts(location, 'IN')
+      ]);
+      setWeather(weatherData);
+      setForecast(forecastData);
+      setAlerts(weatherAlerts.alerts);
+    } catch (error) {
+      setWeather({
+        temperature: 30,
+        humidity: 60,
+        windSpeed: 10,
+        condition: "Sunny",
+        description: "Clear sky",
+        icon: "01d",
+        city: location,
+        country: "IN"
+      });
+      setForecast([
+        { day: "Mon", date: "2023-10-02", temperature: 29, condition: "Sunny", icon: "01d", humidity: 55, windSpeed: 9 },
+        { day: "Tue", date: "2023-10-03", temperature: 31, condition: "Cloudy", icon: "02d", humidity: 65, windSpeed: 12 },
+        { day: "Wed", date: "2023-10-04", temperature: 28, condition: "Rain", icon: "10d", humidity: 70, windSpeed: 15 },
+        { day: "Thu", date: "2023-10-05", temperature: 30, condition: "Sunny", icon: "01d", humidity: 58, windSpeed: 10 },
+        { day: "Fri", date: "2023-10-06", temperature: 27, condition: "Storm", icon: "11d", humidity: 75, windSpeed: 20 },
+        { day: "Sat", date: "2023-10-07", temperature: 29, condition: "Cloudy", icon: "02d", humidity: 60, windSpeed: 11 },
+        { day: "Sun", date: "2023-10-08", temperature: 32, condition: "Sunny", icon: "01d", humidity: 50, windSpeed: 8 },
+      ]);
+      setAlerts([{ type: "info", title: "Good Weather", message: "Favorable for sowing rice", icon: "🌱" }]);
+    }
+
+    // Update market prices based on location
+    const locationPrices = {
+      Mumbai: [
+        { crop: "Cotton", price: 5600, market: "Mumbai" },
+        { crop: "Rice", price: 1850, market: "Hyderabad" },
+        { crop: "Wheat", price: 2200, market: "Delhi" },
+        { crop: "Maize", price: 1600, market: "Bangalore" },
+        { crop: "Sugarcane", price: 320, market: "Pune" },
+        { crop: "Turmeric", price: 7500, market: "Nizamabad" }
+      ],
+      Delhi: [
+        { crop: "Wheat", price: 2200, market: "Delhi" },
+        { crop: "Rice", price: 1850, market: "Hyderabad" },
+        { crop: "Maize", price: 1600, market: "Bangalore" },
+        { crop: "Cotton", price: 5600, market: "Mumbai" },
+        { crop: "Sugarcane", price: 320, market: "Pune" },
+        { crop: "Turmeric", price: 7500, market: "Nizamabad" }
+      ],
+      Hyderabad: [
+        { crop: "Rice", price: 1850, market: "Hyderabad" },
+        { crop: "Wheat", price: 2200, market: "Delhi" },
+        { crop: "Maize", price: 1600, market: "Bangalore" },
+        { crop: "Cotton", price: 5600, market: "Mumbai" },
+        { crop: "Sugarcane", price: 320, market: "Pune" },
+        { crop: "Turmeric", price: 7500, market: "Nizamabad" }
+      ]
+    };
+    setMarketPrices(locationPrices[location as keyof typeof locationPrices] || locationPrices.Mumbai);
+
+    // Update soil health based on location
+    const locationSoilHealth = {
+      Mumbai: {
+        ph: 6.8,
+        moisture: "Moderate (45%)",
+        fertility: "High",
+        nitrogen: "Sufficient",
+        phosphorus: "Moderate",
+        potassium: "Adequate",
+        organicMatter: "Good (3.5%)"
+      },
+      Delhi: {
+        ph: 7.2,
+        moisture: "Low (30%)",
+        fertility: "Medium",
+        nitrogen: "Low",
+        phosphorus: "High",
+        potassium: "Adequate",
+        organicMatter: "Moderate (2.8%)"
+      },
+      Hyderabad: {
+        ph: 6.5,
+        moisture: "High (60%)",
+        fertility: "High",
+        nitrogen: "Sufficient",
+        phosphorus: "Moderate",
+        potassium: "High",
+        organicMatter: "Good (4.0%)"
+      }
+    };
+    setSoilHealth(locationSoilHealth[location as keyof typeof locationSoilHealth] || locationSoilHealth.Mumbai);
+  };
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -36,10 +133,14 @@ const Dashboard = () => {
           navigate('/login');
           return;
         }
-        const [cropsData, ordersData] = await Promise.all([
-          apiClient.getCrops(),
-          apiClient.getOrders(token)
-        ]);
+        // Mock data for crops and orders
+        const cropsData = [
+          { id: '1', name: 'Wheat', quantity: 100, price: 2200, location: 'Delhi', harvestDate: '2023-12-01', photos: [], farmerId: 'demo-id', farmerName: 'Demo Farmer', createdAt: new Date().toISOString() },
+          { id: '2', name: 'Rice', quantity: 50, price: 1850, location: 'Hyderabad', harvestDate: '2023-11-15', photos: [], farmerId: 'demo-id', farmerName: 'Demo Farmer', createdAt: new Date().toISOString() }
+        ];
+        const ordersData = [
+          { id: '1', buyerId: 'buyer-id', sellerId: 'demo-id', cropId: '1', quantity: 10, totalAmount: 22000, status: 'pending' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        ];
         setCrops(cropsData);
         setOrders(ordersData);
       } catch (error) {
@@ -50,64 +151,13 @@ const Dashboard = () => {
       }
     };
 
-    const loadWeatherSoilMarket = async () => {
-      try {
-        const [weatherData, forecastData, weatherAlerts] = await Promise.all([
-          getCurrentWeather('Mumbai', 'IN'),
-          getWeatherForecast('Mumbai', 'IN'),
-          getWeatherAlerts('Mumbai', 'IN')
-        ]);
-        setWeather(weatherData);
-        setForecast(forecastData);
-        setAlerts(weatherAlerts.alerts);
-      } catch (error) {
-        setWeather({
-          temperature: 30,
-          humidity: 60,
-          windSpeed: 10,
-          condition: "Sunny",
-          description: "Clear sky",
-          icon: "01d",
-          city: "Mumbai",
-          country: "IN"
-        });
-        setForecast([
-          { day: "Mon", date: "2023-10-02", temperature: 29, condition: "Sunny", icon: "01d", humidity: 55, windSpeed: 9 },
-          { day: "Tue", date: "2023-10-03", temperature: 31, condition: "Cloudy", icon: "02d", humidity: 65, windSpeed: 12 },
-          { day: "Wed", date: "2023-10-04", temperature: 28, condition: "Rain", icon: "10d", humidity: 70, windSpeed: 15 },
-          { day: "Thu", date: "2023-10-05", temperature: 30, condition: "Sunny", icon: "01d", humidity: 58, windSpeed: 10 },
-          { day: "Fri", date: "2023-10-06", temperature: 27, condition: "Storm", icon: "11d", humidity: 75, windSpeed: 20 },
-          { day: "Sat", date: "2023-10-07", temperature: 29, condition: "Cloudy", icon: "02d", humidity: 60, windSpeed: 11 },
-          { day: "Sun", date: "2023-10-08", temperature: 32, condition: "Sunny", icon: "01d", humidity: 50, windSpeed: 8 },
-        ]);
-        setAlerts([{ type: "info", title: "Good Weather", message: "Favorable for sowing rice", icon: "🌱" }]);
-      }
-
-      // Soil health mock data
-      setSoilHealth({
-        ph: 6.8,
-        moisture: "Moderate (45%)",
-        fertility: "High",
-        nitrogen: "Sufficient",
-        phosphorus: "Moderate",
-        potassium: "Adequate",
-        organicMatter: "Good (3.5%)"
-      });
-
-      // Market prices mock data
-      setMarketPrices([
-        { crop: "Wheat", price: 2200, market: "Delhi" },
-        { crop: "Rice", price: 1850, market: "Hyderabad" },
-        { crop: "Maize", price: 1600, market: "Bangalore" },
-        { crop: "Cotton", price: 5600, market: "Mumbai" },
-        { crop: "Sugarcane", price: 320, market: "Pune" },
-        { crop: "Turmeric", price: 7500, market: "Nizamabad" }
-      ]);
-    };
-
     loadDashboardData();
-    loadWeatherSoilMarket();
+    updateDataBasedOnLocation(selectedLocation);
   }, [state.user, toast, navigate]);
+
+  useEffect(() => {
+    updateDataBasedOnLocation(selectedLocation);
+  }, [selectedLocation]);
 
   const handleLogout = () => {
     logout();
@@ -126,9 +176,21 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-green-700">{t('dashboard.welcome')}, {state.user?.name}!</h1>
-          <Button variant="destructive" size="sm" onClick={handleLogout} className="flex items-center space-x-1">
-            <LogOut className="h-4 w-4" /> <span>{t('nav.logout')}</span>
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Mumbai">Mumbai</SelectItem>
+                <SelectItem value="Delhi">Delhi</SelectItem>
+                <SelectItem value="Hyderabad">Hyderabad</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="destructive" size="sm" onClick={handleLogout} className="flex items-center space-x-1">
+              <LogOut className="h-4 w-4" /> <span>{t('nav.logout')}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Alerts */}
@@ -150,7 +212,7 @@ const Dashboard = () => {
         {/* Weather & Soil */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Weather Card */}
-          <Card asChild>
+          <Card>
             <motion.div whileHover={{ scale: 1.03 }} className="cursor-pointer">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2"><Sun className="text-yellow-500" /> {t('dashboard.weather')} - {weather?.city}</CardTitle>
@@ -172,29 +234,38 @@ const Dashboard = () => {
           </Card>
 
           {/* Soil Health Card */}
-          <Card asChild>
+          <Card>
             <motion.div whileHover={{ scale: 1.03 }} className="cursor-pointer">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2"><Leaf className="text-green-500" /> Soil Health</CardTitle>
                 <CardDescription>Current Field Report</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-1 text-sm">
-                  <li>🌱 pH: {soilHealth?.ph}</li>
-                  <li>💧 Moisture: {soilHealth?.moisture}</li>
-                  <li>🌾 Fertility: {soilHealth?.fertility}</li>
-                  <li>🧪 Nitrogen: {soilHealth?.nitrogen}</li>
-                  <li>🧪 Phosphorus: {soilHealth?.phosphorus}</li>
-                  <li>🧪 Potassium: {soilHealth?.potassium}</li>
-                  <li>🌿 Organic Matter: {soilHealth?.organicMatter}</li>
-                </ul>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-green-700">pH Level</h3>
+                    <p className="text-2xl font-bold">{soilHealth?.ph}</p>
+                  </div>
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-blue-700">Moisture</h3>
+                    <p className="text-2xl font-bold">{soilHealth?.moisture}</p>
+                  </div>
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-yellow-700">Fertility</h3>
+                    <p className="text-2xl font-bold">{soilHealth?.fertility}</p>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-purple-700">Nitrogen</h3>
+                    <p className="text-2xl font-bold">{soilHealth?.nitrogen}</p>
+                  </div>
+                </div>
               </CardContent>
             </motion.div>
           </Card>
         </div>
 
         {/* Market Prices */}
-        <Card asChild>
+        <Card>
           <motion.div whileHover={{ scale: 1.02 }} className="cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2"><BarChart3 className="text-blue-500" /> Live Market Prices</CardTitle>
