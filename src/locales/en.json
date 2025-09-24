@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "aiAdvisory": "AI Advisory",
+    "pestDetection": "Pest Detection",
+    "cropMarket": "Crop Market",
+    "buyInputs": "Buy Inputs",
+    "machinery": "Machinery",
+    "knowledgeHub": "Knowledge Center",
+    "feedback": "Feedback",
+    "login": "Login",
+    "logout": "Logout",
+    "services": "Services"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset"
+  },
+  "login": {
+    "title": "Welcome to Smart Kisan Shakti",
+    "subtitle": "Empowering Farmers with Technology",
+    "email": "Email Address",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "loginButton": "Sign In",
+    "signupLink": "Don't have an account? Sign up",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "cropHealth": "Crop Health",
+    "marketPrices": "Market Prices",
+    "weather": "Weather",
+    "weatherForecast": "7-Day Forecast",
+    "advisory": "Advisory"
+  },
+  "home": {
+    "hero": {
+      "title": "Revolutionizing Agriculture with Smart Technology",
+      "subtitle": "Empowering Farmers for a Better Tomorrow",
+      "description": "Connect, trade, and grow with our comprehensive platform designed for the modern agricultural community. Access AI-powered insights, real-time market data, and expert advice to maximize your farm's potential.",
+      "exploreFeatures": "Explore Features",
+      "viewCropMarket": "View Crop Market"
+    },
+    "features": {
+      "title": "Our Key Features",
+      "description": "Discover the powerful tools and services that make farming smarter, easier, and more profitable.",
+      "aiAdvisory": {
+        "title": "AI-Powered Advisory",
+        "description": "Get personalized farming recommendations and insights powered by advanced artificial intelligence."
+      },
+      "pestDetection": {
+        "title": "Smart Pest Detection",
+        "description": "Early detection and management of crop pests using cutting-edge technology and image analysis."
+      },
+      "marketIntelligence": {
+        "title": "Market Intelligence",
+        "description": "Access real-time market trends, price predictions, and trading opportunities to optimize your sales."
+      },
+      "qualityAssurance": {
+        "title": "Quality Assurance",
+        "description": "Ensure premium quality of your produce with our testing, certification, and grading services."
+      }
+    },
+    "aiFeatures": {
+      "title": "AI-Powered Solutions",
+      "description": "Leverage the power of artificial intelligence to transform your farming operations and decision-making.",
+      "multilingualChat": {
+        "title": "Multilingual AI Chat",
+        "description": "Get instant answers in your preferred language"
+      },
+      "voiceCommands": {
+        "title": "Voice Commands",
+        "description": "Control your app with simple voice commands"
+      },
+      "smartAnalytics": {
+        "title": "Smart Analytics",
+        "description": "Advanced data insights and predictions"
+      }
+    },
+    "quickAccess": {
+      "title": "Quick Access",
+      "description": "Get started with these essential features",
+      "farmDashboard": {
+        "title": "Farm Dashboard",
+        "description": "Monitor your farm's performance"
+      },
+      "askAIAssistant": {
+        "title": "Ask AI Assistant",
+        "description": "Get instant farming advice"
+      },
+      "detectPests": {
+        "title": "Detect Pests",
+        "description": "Upload images for pest identification"
+      }
+    }
+  }
+}
