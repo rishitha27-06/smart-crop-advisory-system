@@ -3,11 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, CreditCard, Truck, MapPin } from 'lucide-react';
+import { ShoppingCart, CreditCard, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -25,23 +23,23 @@ const Checkout = () => {
     city: '',
     state: '',
     pincode: '',
-    country: 'India'
+    country: 'India',
   });
   const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
 
   const handleInputChange = (field: string, value: string) => {
     setShippingAddress(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handlePlaceOrder = async () => {
     if (cartState.items.length === 0) {
       toast({
-        title: "Cart is Empty",
-        description: "Add some items to your cart before placing an order",
-        variant: "destructive",
+        title: 'Cart is Empty',
+        description: 'Add some items to your cart before placing an order',
+        variant: 'destructive',
       });
       return;
     }
@@ -49,9 +47,9 @@ const Checkout = () => {
     // Validate shipping address
     if (!shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
       toast({
-        title: "Shipping Address Required",
-        description: "Please fill in all shipping address fields",
-        variant: "destructive",
+        title: 'Shipping Address Required',
+        description: 'Please fill in all shipping address fields',
+        variant: 'destructive',
       });
       return;
     }
@@ -59,57 +57,32 @@ const Checkout = () => {
     setIsPlacingOrder(true);
 
     try {
+      // Prepare order data to send to backend
       const orderData = {
         shippingAddress,
-        paymentMethod
+        paymentMethod,
+        items: cartState.items,
+        totalAmount: cartState.total,
+        userId: localStorage.getItem('userId') || 'demo-user', // replace with real user ID
       };
 
       const response = await api.post('/orders', orderData);
 
       if (response.data.success) {
-        // Store order in localStorage for demo purposes
-        const existingOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-        const newOrder = {
-          ...response.data.data,
-          _id: `ORD-${Date.now()}`,
-          createdAt: new Date().toISOString()
-        };
-        existingOrders.unshift(newOrder);
-        localStorage.setItem('userOrders', JSON.stringify(existingOrders));
-
         await clearCart();
         toast({
-          title: "Order Placed Successfully!",
-          description: "Your order has been placed and is being processed",
+          title: 'Order Placed Successfully!',
+          description: 'Your order has been placed and is being processed',
         });
-        navigate('/order-summary', { state: { order: newOrder } });
+        navigate('/order-summary', { state: { order: response.data.data } });
       }
     } catch (error: any) {
-      console.error('Order placement error:', error);
-      // Fallback to local storage if API fails
-      const existingOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-      const newOrder = {
-        id: `ORD-${Date.now()}`,
-        buyerId: 'demo-user',
-        sellerId: 'demo-seller',
-        cropId: cartState.items[0]?.id || 'demo-crop',
-        quantity: cartState.items.reduce((sum, item) => sum + item.quantity, 0),
-        totalAmount: cartState.total,
-        status: 'pending',
-        shippingAddress,
-        paymentMethod,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      existingOrders.unshift(newOrder);
-      localStorage.setItem('userOrders', JSON.stringify(existingOrders));
-
-      await clearCart();
+      console.error('Order placement error:', error.response?.data || error.message);
       toast({
-        title: "Order Placed Successfully!",
-        description: "Your order has been placed and is being processed",
+        title: 'Order Failed',
+        description: 'Something went wrong. Please try again later.',
+        variant: 'destructive',
       });
-      navigate('/order-summary', { state: { order: newOrder } });
     } finally {
       setIsPlacingOrder(false);
     }
@@ -128,9 +101,7 @@ const Checkout = () => {
             <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold text-foreground mb-2">Your Cart is Empty</h1>
             <p className="text-muted-foreground mb-6">Add some items to your cart before checkout</p>
-            <Button onClick={() => navigate('/crop-market')}>
-              Browse Products
-            </Button>
+            <Button onClick={() => navigate('/crop-market')}>Browse Products</Button>
           </motion.div>
         </div>
       </div>
@@ -160,23 +131,16 @@ const Checkout = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Order Summary
+                  <ShoppingCart className="h-5 w-5" /> Order Summary
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {cartState.items.map((item) => (
+                {cartState.items.map(item => (
                   <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Quantity: {item.quantity}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                       <p className="text-sm font-medium">₹{item.price}</p>
                     </div>
                     <div className="text-right">
@@ -221,8 +185,7 @@ const Checkout = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Shipping Address
+                  <MapPin className="h-5 w-5" /> Shipping Address
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -232,7 +195,7 @@ const Checkout = () => {
                     <Input
                       id="street"
                       value={shippingAddress.street}
-                      onChange={(e) => handleInputChange('street', e.target.value)}
+                      onChange={e => handleInputChange('street', e.target.value)}
                       placeholder="123 Main Street"
                     />
                   </div>
@@ -241,7 +204,7 @@ const Checkout = () => {
                     <Input
                       id="city"
                       value={shippingAddress.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      onChange={e => handleInputChange('city', e.target.value)}
                       placeholder="City"
                     />
                   </div>
@@ -250,7 +213,7 @@ const Checkout = () => {
                     <Input
                       id="state"
                       value={shippingAddress.state}
-                      onChange={(e) => handleInputChange('state', e.target.value)}
+                      onChange={e => handleInputChange('state', e.target.value)}
                       placeholder="State"
                     />
                   </div>
@@ -259,7 +222,7 @@ const Checkout = () => {
                     <Input
                       id="pincode"
                       value={shippingAddress.pincode}
-                      onChange={(e) => handleInputChange('pincode', e.target.value)}
+                      onChange={e => handleInputChange('pincode', e.target.value)}
                       placeholder="123456"
                     />
                   </div>
@@ -271,8 +234,7 @@ const Checkout = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Payment Method
+                  <CreditCard className="h-5 w-5" /> Payment Method
                 </CardTitle>
               </CardHeader>
               <CardContent>
