@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import api from '@/lib/api';
+import api from '@/lib/api'; // Axios instance with deployed backend URL
 
 const Checkout = () => {
   const { state: cartState, clearCart } = useCart();
@@ -28,10 +28,7 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
 
   const handleInputChange = (field: string, value: string) => {
-    setShippingAddress(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+    setShippingAddress(prev => ({ ...prev, [field]: value }));
   };
 
   const handlePlaceOrder = async () => {
@@ -44,7 +41,6 @@ const Checkout = () => {
       return;
     }
 
-    // Validate shipping address
     if (!shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
       toast({
         title: 'Shipping Address Required',
@@ -57,30 +53,34 @@ const Checkout = () => {
     setIsPlacingOrder(true);
 
     try {
-      // Prepare order data to send to backend
       const orderData = {
+        userId: localStorage.getItem('userId') || 'demo-user',
+        items: cartState.items,
         shippingAddress,
         paymentMethod,
-        items: cartState.items,
         totalAmount: cartState.total,
-        userId: localStorage.getItem('userId') || 'demo-user', // replace with real user ID
       };
 
       const response = await api.post('/orders', orderData);
 
       if (response.data.success) {
+        // Clear cart
         await clearCart();
+
+        // Navigate to order summary
+        navigate('/order-summary', { state: { order: response.data.data } });
+
         toast({
           title: 'Order Placed Successfully!',
           description: 'Your order has been placed and is being processed',
         });
-        navigate('/order-summary', { state: { order: response.data.data } });
       }
     } catch (error: any) {
       console.error('Order placement error:', error.response?.data || error.message);
+
       toast({
         title: 'Order Failed',
-        description: 'Something went wrong. Please try again later.',
+        description: error.response?.data?.message || 'Network or server error',
         variant: 'destructive',
       });
     } finally {
@@ -111,23 +111,14 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Checkout</h1>
           <p className="text-muted-foreground">Review your order and complete your purchase</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Order Summary */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
+          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -152,35 +143,18 @@ const Checkout = () => {
                 <Separator />
 
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span>₹{cartState.total}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span className="text-green-600">Free</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax</span>
-                    <span>₹0</span>
-                  </div>
+                  <div className="flex justify-between"><span>Subtotal</span><span>₹{cartState.total}</span></div>
+                  <div className="flex justify-between"><span>Shipping</span><span className="text-green-600">Free</span></div>
+                  <div className="flex justify-between"><span>Tax</span><span>₹0</span></div>
                   <Separator />
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total</span>
-                    <span>₹{cartState.total}</span>
-                  </div>
+                  <div className="flex justify-between font-bold text-lg"><span>Total</span><span>₹{cartState.total}</span></div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Shipping & Payment */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="space-y-6">
             {/* Shipping Address */}
             <Card>
               <CardHeader>
@@ -192,39 +166,19 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="street">Street Address</Label>
-                    <Input
-                      id="street"
-                      value={shippingAddress.street}
-                      onChange={e => handleInputChange('street', e.target.value)}
-                      placeholder="123 Main Street"
-                    />
+                    <Input id="street" value={shippingAddress.street} onChange={e => handleInputChange('street', e.target.value)} placeholder="123 Main Street" />
                   </div>
                   <div>
                     <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={shippingAddress.city}
-                      onChange={e => handleInputChange('city', e.target.value)}
-                      placeholder="City"
-                    />
+                    <Input id="city" value={shippingAddress.city} onChange={e => handleInputChange('city', e.target.value)} placeholder="City" />
                   </div>
                   <div>
                     <Label htmlFor="state">State</Label>
-                    <Input
-                      id="state"
-                      value={shippingAddress.state}
-                      onChange={e => handleInputChange('state', e.target.value)}
-                      placeholder="State"
-                    />
+                    <Input id="state" value={shippingAddress.state} onChange={e => handleInputChange('state', e.target.value)} placeholder="State" />
                   </div>
                   <div>
                     <Label htmlFor="pincode">Pincode</Label>
-                    <Input
-                      id="pincode"
-                      value={shippingAddress.pincode}
-                      onChange={e => handleInputChange('pincode', e.target.value)}
-                      placeholder="123456"
-                    />
+                    <Input id="pincode" value={shippingAddress.pincode} onChange={e => handleInputChange('pincode', e.target.value)} placeholder="123456" />
                   </div>
                 </div>
               </CardContent>
@@ -239,9 +193,7 @@ const Checkout = () => {
               </CardHeader>
               <CardContent>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment method" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select payment method" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cash_on_delivery">Cash on Delivery</SelectItem>
                     <SelectItem value="online">Online Payment</SelectItem>
@@ -251,12 +203,8 @@ const Checkout = () => {
               </CardContent>
             </Card>
 
-            {/* Place Order Button */}
-            <Button
-              onClick={handlePlaceOrder}
-              disabled={isPlacingOrder}
-              className="w-full py-6 text-lg"
-            >
+            {/* Place Order */}
+            <Button onClick={handlePlaceOrder} disabled={isPlacingOrder} className="w-full py-6 text-lg">
               {isPlacingOrder ? 'Placing Order...' : `Place Order - ₹${cartState.total}`}
             </Button>
           </motion.div>
