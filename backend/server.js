@@ -12,11 +12,7 @@ import cropRoutes from './routes/crops.js';
 import cartRoutes from './routes/cart.js';
 import orderRoutes from './routes/order.js';
 import weatherRoutes from './routes/weather.js';
-// import userRoutes from './routes/users.js';
-// import inputRoutes from './routes/inputs.js';
-// import machineryRoutes from './routes/machinery.js';
-// import aiChatRoutes from './routes/aiChat.js';
-// import pestDetectionRoutes from './routes/pestDetection.js';
+// import other routes if needed
 import { errorHandler } from './middleware/errorHandler.js';
 import { notFound } from './middleware/notFound.js';
 
@@ -29,7 +25,11 @@ const server = createServer(app);
 // Socket.io setup for real-time features
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: [
+      process.env.FRONTEND_URL || "https://smart-crop-advisory-system-frontendd.onrender.com",
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ],
     methods: ["GET", "POST"]
   }
 });
@@ -44,14 +44,18 @@ app.use(compression());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 100,
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use(limiter);
 
-// CORS configuration
+// ✅ Correct CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || ["http://localhost:5173", "http://localhost:8080", "http://localhost:8081", "http://localhost:8082", "http://localhost:8083", "http://localhost:3000", "http://localhost:8082"],
+  origin: [
+    process.env.FRONTEND_URL || "https://smart-crop-advisory-system-frontendd.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:3000"
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -100,7 +104,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Global error handler for uncaught exceptions
+// Global error handlers
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   process.exit(1);
@@ -113,7 +117,6 @@ process.on('unhandledRejection', (err) => {
 
 const PORT = process.env.PORT || 3001;
 
-// Enhanced server startup with better error handling
 const startServer = () => {
   try {
     server.listen(PORT, () => {
@@ -123,7 +126,7 @@ const startServer = () => {
 🌍 Environment: ${process.env.NODE_ENV || 'development'}
 📊 Health Check: http://localhost:${PORT}/api/health
 🌤️ Weather API: http://localhost:${PORT}/api/weather/current
-🔧 CORS Origins: ${process.env.FRONTEND_URL || 'http://localhost:5173'}
+🔧 CORS Origins: ${process.env.FRONTEND_URL || 'https://smart-crop-advisory-system-frontendd.onrender.com'}
       `);
     });
 
