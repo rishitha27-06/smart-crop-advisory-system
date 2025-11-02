@@ -2,37 +2,82 @@ import crypto from 'crypto';
 import User from '../models/User.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
-// 🔹 Demo user details (static)
-const DEMO_USER = {
-  id: 'demo-id',
-  name: 'Demo User',
-  email: 'demo@gmail.com',
-  phone: '9999999999',
-  role: 'farmer',
-  language: 'en',
-  isVerified: true,
-  profile: { bio: 'Demo account for testing' },
-  location: {
-    type: 'Point',
-    coordinates: [77.1025, 28.7041],
-    address: 'Delhi',
-    state: 'Delhi',
-    district: 'New Delhi',
-    pincode: '110001'
-  },
-  preferences: {},
-  createdAt: new Date()
-};
-
 // ============================================================
-// @desc    Register user (DISABLED in demo)
+// @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
 // ============================================================
 export const register = asyncHandler(async (req, res) => {
-  return res.status(403).json({
-    success: false,
-    message: 'Registration disabled in demo mode. Use demo@gmail.com / 123456 to login.'
+  const { name, email, phone, password, language } = req.body;
+
+  // Validation
+  if (!name || !email || !phone || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide name, email, phone, and password'
+    });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: 'Password must be at least 6 characters long'
+    });
+  }
+
+  // Phone number validation (Indian format)
+  const phoneRegex = /^[6-9]\d{9}$/;
+  if (!phoneRegex.test(phone)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid 10-digit Indian phone number'
+    });
+  }
+
+  // Check if user already exists
+  const existingUser = await User.findOne({
+    $or: [{ email: email.toLowerCase() }, { phone }]
+  });
+
+  if (existingUser) {
+    return res.status(400).json({
+      success: false,
+      message: 'User with this email or phone number already exists'
+    });
+  }
+
+  // Create user
+  const user = await User.create({
+    name,
+    email: email.toLowerCase(),
+    phone,
+    password,
+    language: language || 'en',
+    role: 'farmer',
+    isVerified: true, // For demo purposes, auto-verify
+    location: {
+      type: 'Point',
+      coordinates: [77.1025, 28.7041], // Default to Delhi
+      address: 'Delhi',
+      state: 'Delhi',
+      district: 'New Delhi',
+      pincode: '110001'
+    },
+    profile: { bio: 'New user account' },
+    preferences: {}
+  });
+
+  // Generate JWT token
+  const token = user.getSignedJwtToken();
+
+  // Remove password from response
+  user.password = undefined;
+
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+    token,
+    user
   });
 });
 
@@ -51,18 +96,37 @@ export const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // ✅ Accept any credentials for login
-  const user = {
-    ...DEMO_USER,
-    email: email,
-    name: email.split('@')[0] || 'User', // Use part before @ as name
-  };
+  // Check for user and include password for comparison
+  const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
-  return res.status(200).json({
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid credentials'
+    });
+  }
+
+  // Check if password matches
+  const isMatch = await user.matchPassword(password);
+
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid credentials'
+    });
+  }
+
+  // Generate JWT token
+  const token = user.getSignedJwtToken();
+
+  // Remove password from response
+  user.password = undefined;
+
+  res.status(200).json({
     success: true,
     message: 'Login successful',
-    token: 'demo-token-123',
-    user: user
+    token,
+    user
   });
 });
 
@@ -72,17 +136,12 @@ export const login = asyncHandler(async (req, res) => {
 // @access  Private
 // ============================================================
 export const getMe = asyncHandler(async (req, res) => {
-  // Accept demo token from header
-  const authHeader = req.headers.authorization || '';
-  const token = authHeader.startsWith('Bearer ')
-    ? authHeader.split(' ')[1]
-    : null;
+  const user = await User.findById(req.user.id);
 
-  if (token === 'demo-token-123') {
-    return res.status(200).json({ success: true, user: DEMO_USER });
-  }
-
-  return res.status(401).json({ success: false, message: 'Unauthorized' });
+  res.status(200).json({
+    success: true,
+    user
+  });
 });
 
 // ============================================================

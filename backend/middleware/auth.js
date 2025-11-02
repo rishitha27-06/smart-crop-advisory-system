@@ -4,7 +4,7 @@ import User from '../models/User.js';
 // middleware/auth.js
 
 // Protect routes - verify token
-export const protect = (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
 
   if (
@@ -29,15 +29,25 @@ export const protect = (req, res, next) => {
       return next();
     }
 
-    // Otherwise, verify as JWT token
+    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+
+    // Get user from database
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "No user found with this token",
+      });
+    }
 
     // Add user info to request
     req.user = {
-      id: decoded.id,
-      name: decoded.name,
-      email: decoded.email,
-      role: decoded.role
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
     };
 
     next();

@@ -121,29 +121,114 @@ class WeatherService {
   }
 
   getMockWeatherData(city) {
+    // Get current date and time for realistic weather data
+    const now = new Date();
+    const hour = now.getHours();
+
+    // Simulate realistic weather patterns based on location and time
+    const cityWeather = {
+      Mumbai: {
+        temperature: hour >= 6 && hour <= 18 ? 32 : 28, // Warmer during day
+        humidity: 75,
+        windSpeed: 8,
+        condition: hour >= 6 && hour <= 18 ? 'Sunny' : 'Clear',
+        description: hour >= 6 && hour <= 18 ? 'clear sky' : 'clear sky',
+        icon: hour >= 6 && hour <= 18 ? '01d' : '01n'
+      },
+      Delhi: {
+        temperature: hour >= 6 && hour <= 18 ? 35 : 30,
+        humidity: 45,
+        windSpeed: 12,
+        condition: hour >= 6 && hour <= 18 ? 'Sunny' : 'Clear',
+        description: hour >= 6 && hour <= 18 ? 'clear sky' : 'clear sky',
+        icon: hour >= 6 && hour <= 18 ? '01d' : '01n'
+      },
+      Hyderabad: {
+        temperature: hour >= 6 && hour <= 18 ? 34 : 29,
+        humidity: 55,
+        windSpeed: 10,
+        condition: hour >= 6 && hour <= 18 ? 'Sunny' : 'Clear',
+        description: hour >= 6 && hour <= 18 ? 'clear sky' : 'clear sky',
+        icon: hour >= 6 && hour <= 18 ? '01d' : '01n'
+      }
+    };
+
+    const weather = cityWeather[city] || cityWeather.Mumbai;
+
     return {
-      temperature: 28,
-      humidity: 65,
-      windSpeed: 12,
-      condition: 'Partly Cloudy',
-      description: 'partly cloudy',
-      icon: '02d',
+      temperature: weather.temperature,
+      humidity: weather.humidity,
+      windSpeed: weather.windSpeed,
+      condition: weather.condition,
+      description: weather.description,
+      icon: weather.icon,
       city: city,
       country: 'IN'
     };
   }
 
   getMockForecastData() {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return days.map((day, index) => ({
-      date: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      day: day,
-      temperature: 25 + Math.floor(Math.random() * 10),
-      condition: ['Sunny', 'Cloudy', 'Rain'][Math.floor(Math.random() * 3)],
-      icon: '01d',
-      humidity: 60 + Math.floor(Math.random() * 30),
-      windSpeed: 5 + Math.floor(Math.random() * 15)
-    }));
+    const today = new Date();
+    const forecast = [];
+
+    // Get current month to simulate seasonal weather
+    const currentMonth = today.getMonth();
+    const isSummer = currentMonth >= 2 && currentMonth <= 4; // March-May
+    const isMonsoon = currentMonth >= 5 && currentMonth <= 9; // June-Oct
+    const isWinter = currentMonth >= 10 || currentMonth <= 1; // Nov-Feb
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+
+      let dayLabel;
+      if (i === 0) dayLabel = 'Today';
+      else if (i === 1) dayLabel = 'Tomorrow';
+      else dayLabel = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+      // Base temperatures based on season - October is post-monsoon, cooling down
+      let baseTemp;
+      if (isSummer) baseTemp = 35;
+      else if (isMonsoon) baseTemp = 28;
+      else if (isWinter) baseTemp = 22;
+      else baseTemp = 30; // Spring/Fall - October is transitioning to winter
+
+      // Add daily variation
+      const dailyVariation = Math.sin((i / 7) * Math.PI * 2) * 3;
+      const randomVariation = (Math.random() - 0.5) * 6;
+      const temperature = Math.round(baseTemp + dailyVariation + randomVariation);
+
+      // Weather conditions based on season and temperature - October has mixed weather
+      let condition, icon;
+      if (isMonsoon && Math.random() > 0.6) {
+        condition = Math.random() > 0.7 ? 'Rain' : 'Cloudy';
+        icon = Math.random() > 0.7 ? '10d' : '03d';
+      } else if (temperature > 33) {
+        condition = 'Sunny';
+        icon = '01d';
+      } else if (temperature > 28) {
+        condition = Math.random() > 0.6 ? 'Partly Cloudy' : 'Sunny';
+        icon = Math.random() > 0.6 ? '02d' : '01d';
+      } else if (temperature > 24) {
+        condition = Math.random() > 0.5 ? 'Cloudy' : 'Partly Cloudy';
+        icon = Math.random() > 0.5 ? '03d' : '02d';
+      } else {
+        condition = Math.random() > 0.7 ? 'Rain' : 'Cloudy';
+        icon = Math.random() > 0.7 ? '10d' : '03d';
+      }
+
+      forecast.push({
+        date: date.toISOString().split('T')[0],
+        day: dayLabel,
+        temperature: temperature,
+        condition: condition,
+        icon: icon,
+        humidity: isMonsoon ? 70 + Math.floor(Math.random() * 25) : 40 + Math.floor(Math.random() * 40),
+        windSpeed: 5 + Math.floor(Math.random() * 15)
+      });
+    }
+
+    return forecast;
   }
 }
 
