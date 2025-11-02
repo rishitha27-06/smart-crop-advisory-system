@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://smart-kisan-shakthi.onrender.com/api';
+const API_BASE_URL = 'https://smart-crop-advisory-system-backend.onrender.com';
 
 // Weather API interfaces and functions
 export interface WeatherData {
