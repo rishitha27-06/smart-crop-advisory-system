@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = "https://smart-kisan-shakthi.onrender.com/api";
+const API_BASE_URL = "https://smart-crop-advisory-system-backend.onrender.com/api";
 
 
 const api = axios.create({
