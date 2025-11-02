@@ -10,7 +10,6 @@ import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import api from '@/lib/api'; // Axios instance with deployed backend URL
 
 const Checkout = () => {
   const { state: cartState, clearCart } = useCart();
@@ -31,11 +30,11 @@ const Checkout = () => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = () => {
     if (cartState.items.length === 0) {
       toast({
         title: 'Cart is Empty',
-        description: 'Add some items to your cart before placing an order',
+        description: 'Add items before placing an order',
         variant: 'destructive',
       });
       return;
@@ -44,7 +43,7 @@ const Checkout = () => {
     if (!shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
       toast({
         title: 'Shipping Address Required',
-        description: 'Please fill in all shipping address fields',
+        description: 'Please fill all shipping address fields',
         variant: 'destructive',
       });
       return;
@@ -52,52 +51,33 @@ const Checkout = () => {
 
     setIsPlacingOrder(true);
 
-    try {
-      const orderData = {
-        userId: localStorage.getItem('userId') || 'demo-user',
+    setTimeout(() => {
+      // Mock order creation
+      const mockOrder = {
+        orderId: `SKS${Date.now().toString().slice(-6)}`,
         items: cartState.items,
         shippingAddress,
         paymentMethod,
         totalAmount: cartState.total,
       };
 
-      const response = await api.post('/orders', orderData);
-
-      if (response.data.success) {
-        // Clear cart
-        await clearCart();
-
-        // Navigate to order summary
-        navigate('/order-summary', { state: { order: response.data.data } });
-
-        toast({
-          title: 'Order Placed Successfully!',
-          description: 'Your order has been placed and is being processed',
-        });
-      }
-    } catch (error: any) {
-      console.error('Order placement error:', error.response?.data || error.message);
+      clearCart(); // clear cart after order
 
       toast({
-        title: 'Order Failed',
-        description: error.response?.data?.message || 'Network or server error',
-        variant: 'destructive',
+        title: 'Order Placed Successfully!',
+        description: 'Your order has been placed and is being processed',
       });
-    } finally {
+
+      navigate('/order-success', { state: { order: mockOrder } });
       setIsPlacingOrder(false);
-    }
+    }, 1000); // simulate network delay
   };
 
   if (cartState.items.length === 0) {
     return (
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center py-12"
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center py-12">
             <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold text-foreground mb-2">Your Cart is Empty</h1>
             <p className="text-muted-foreground mb-6">Add some items to your cart before checkout</p>
@@ -141,13 +121,9 @@ const Checkout = () => {
                 ))}
 
                 <Separator />
-
-                <div className="space-y-2">
-                  <div className="flex justify-between"><span>Subtotal</span><span>₹{cartState.total}</span></div>
-                  <div className="flex justify-between"><span>Shipping</span><span className="text-green-600">Free</span></div>
-                  <div className="flex justify-between"><span>Tax</span><span>₹0</span></div>
-                  <Separator />
-                  <div className="flex justify-between font-bold text-lg"><span>Total</span><span>₹{cartState.total}</span></div>
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total</span>
+                  <span>₹{cartState.total}</span>
                 </div>
               </CardContent>
             </Card>
@@ -155,7 +131,6 @@ const Checkout = () => {
 
           {/* Shipping & Payment */}
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="space-y-6">
-            {/* Shipping Address */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -164,27 +139,21 @@ const Checkout = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="street">Street Address</Label>
-                    <Input id="street" value={shippingAddress.street} onChange={e => handleInputChange('street', e.target.value)} placeholder="123 Main Street" />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" value={shippingAddress.city} onChange={e => handleInputChange('city', e.target.value)} placeholder="City" />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" value={shippingAddress.state} onChange={e => handleInputChange('state', e.target.value)} placeholder="State" />
-                  </div>
-                  <div>
-                    <Label htmlFor="pincode">Pincode</Label>
-                    <Input id="pincode" value={shippingAddress.pincode} onChange={e => handleInputChange('pincode', e.target.value)} placeholder="123456" />
-                  </div>
+                  {['street','city','state','pincode'].map(field => (
+                    <div key={field}>
+                      <Label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
+                      <Input
+                        id={field}
+                        value={shippingAddress[field]}
+                        onChange={e => handleInputChange(field, e.target.value)}
+                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                      />
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Payment Method */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -203,7 +172,6 @@ const Checkout = () => {
               </CardContent>
             </Card>
 
-            {/* Place Order */}
             <Button onClick={handlePlaceOrder} disabled={isPlacingOrder} className="w-full py-6 text-lg">
               {isPlacingOrder ? 'Placing Order...' : `Place Order - ₹${cartState.total}`}
             </Button>
