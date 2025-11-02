@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Leaf, Mail, Lock, User, Phone, Globe } from 'lucide-react';
+import { Leaf, Mail, Lock, User, Phone, Globe, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,8 @@ const Signup = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    language: 'en'
+    language: 'en',
+    role: 'farmer'
   });
 
   const navigate = useNavigate();
@@ -35,6 +36,13 @@ const Signup = () => {
     setFormData({
       ...formData,
       language: value
+    });
+  };
+
+  const handleRoleChange = (value: string) => {
+    setFormData({
+      ...formData,
+      role: value
     });
   };
 
@@ -105,7 +113,8 @@ const Signup = () => {
           email: formData.email.toLowerCase(),
           phone: formData.phone,
           password: formData.password,
-          language: formData.language
+          language: formData.language,
+          role: formData.role
         };
 
         localStorage.setItem('user', JSON.stringify(userData));
@@ -140,6 +149,13 @@ const Signup = () => {
     { code: 'or', name: 'ଓଡ଼ିଆ (Odia)' },
     { code: 'as', name: 'অসমীয়া (Assamese)' },
     { code: 'kn', name: 'ಕನ್ನಡ (Kannada)' },
+  ];
+
+  const roles = [
+    { value: 'farmer', label: 'Farmer', description: 'Grow and sell crops' },
+    { value: 'input_seller', label: 'Input Seller', description: 'Sell seeds, fertilizers, pesticides' },
+    { value: 'rental_servicer', label: 'Rental Servicer', description: 'Rent out farming equipment' },
+    { value: 'customer', label: 'Customer', description: 'Buy crops, inputs, and rent equipment' }
   ];
 
   return (
@@ -215,6 +231,28 @@ const Signup = () => {
                     className="pl-10"
                     required
                   />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="role">I am a *</Label>
+                <div className="relative">
+                  <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Select value={formData.role} onValueChange={handleRoleChange}>
+                    <SelectTrigger className="pl-10">
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{role.label}</span>
+                            <span className="text-xs text-muted-foreground">{role.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

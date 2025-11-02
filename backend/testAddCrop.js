@@ -2,12 +2,16 @@ import mongoose from 'mongoose';
 import Crop from './models/Crop.js';
 import User from './models/User.js';
 import dotenv from 'dotenv';
+import connectDB from './config/database.js';
 
 // Load environment variables
 dotenv.config();
 
 const testAddCrop = async () => {
   try {
+    // Connect to database
+    await connectDB();
+
     console.log('Testing crop addition...');
 
     // Find existing farmer or create one

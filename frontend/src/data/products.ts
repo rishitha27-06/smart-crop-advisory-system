@@ -79,7 +79,7 @@ export const crops = [
     id: 'crop-7',
     name: 'Fresh Mangoes',
     price: 150,
-    image: tomatoesImg,
+    image: tomatoesImg, // Keep tomatoesImg as placeholder since no mango image
     location: 'Maharashtra',
     description: 'Sweet and juicy mangoes, perfect for fresh consumption and juices',
     category: 'fruit'
@@ -88,7 +88,7 @@ export const crops = [
     id: 'crop-8',
     name: 'Premium Bananas',
     price: 40,
-    image: tomatoesImg,
+    image: tomatoesImg, // Keep tomatoesImg as placeholder since no banana image
     location: 'Kerala',
     description: 'Fresh bananas rich in potassium and natural sweetness',
     category: 'fruit'

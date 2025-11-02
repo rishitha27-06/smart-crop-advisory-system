@@ -4,13 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Leaf, LogOut, BarChart3, CloudRain, Sun, Thermometer, MapPin, Droplets, Zap } from 'lucide-react';
+import { Leaf, LogOut, BarChart3, CloudRain, Sun, Thermometer, MapPin, Droplets, Zap, Plus, ShoppingCart, Tractor } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { apiClient, Crop, Order } from '@/lib/api-fixed';
 import { getCurrentWeather, getWeatherForecast, getWeatherAlerts, WeatherData, ForecastData, WeatherAlert } from '@/lib/api-weather';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import CropForm from '@/components/CropForm';
+import InputForm from '@/components/InputForm';
+import EquipmentForm from '@/components/EquipmentForm';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -26,6 +29,13 @@ const Dashboard = () => {
   const [marketPrices, setMarketPrices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState('Mumbai');
+  const [showCropForm, setShowCropForm] = useState(false);
+  const [showInputForm, setShowInputForm] = useState(false);
+  const [showEquipmentForm, setShowEquipmentForm] = useState(false);
+
+  // Get user role from localStorage
+  const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = userData.role || 'farmer';
 
   const updateDataBasedOnLocation = async (location: string) => {
     try {
@@ -107,15 +117,13 @@ const Dashboard = () => {
       ]
     };
     setMarketPrices(locationPrices[location as keyof typeof locationPrices] || locationPrices.Mumbai);
-
-
   };
 
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
-        
+
         // Load data without authentication checks
         const cropsData = [
           { id: '1', name: 'Wheat', quantity: 100, price: 2200, location: 'Delhi', harvestDate: '2023-12-01', photos: [], farmerId: 'demo-id', farmerName: 'Demo Farmer', createdAt: new Date().toISOString() },
@@ -148,6 +156,21 @@ const Dashboard = () => {
     navigate('/');
   };
 
+  const handleCropAdded = () => {
+    setShowCropForm(false);
+    toast({ title: "Success", description: "Crop added successfully!" });
+  };
+
+  const handleInputAdded = () => {
+    setShowInputForm(false);
+    toast({ title: "Success", description: "Input added successfully!" });
+  };
+
+  const handleEquipmentAdded = () => {
+    setShowEquipmentForm(false);
+    toast({ title: "Success", description: "Equipment added successfully!" });
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-xl font-semibold">{t('common.loading')}</div>;
   }
@@ -158,8 +181,11 @@ const Dashboard = () => {
 
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-green-700">{t('dashboard.welcome')}, Demo User!</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-green-700">{t('dashboard.welcome')}, {userData.name || 'Demo User'}!</h1>
           <div className="flex items-center space-x-4">
+            <Badge variant="outline" className="capitalize">
+              {userRole.replace('_', ' ')}
+            </Badge>
             <Select value={selectedLocation} onValueChange={setSelectedLocation}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Location" />
@@ -172,6 +198,72 @@ const Dashboard = () => {
             </Select>
           </div>
         </div>
+
+        {/* Role-based Action Buttons */}
+        {userRole !== 'customer' && (
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-blue-800">
+                <Plus className="text-blue-600 h-6 w-6" />
+                <span>Quick Actions</span>
+              </CardTitle>
+              <CardDescription className="text-blue-600">
+                Add your products or services to the marketplace
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-4">
+                {userRole === 'farmer' && (
+                  <Button
+                    onClick={() => setShowCropForm(true)}
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  >
+                    <Leaf className="h-4 w-4" />
+                    Add Crop
+                  </Button>
+                )}
+                {userRole === 'input_seller' && (
+                  <Button
+                    onClick={() => setShowInputForm(true)}
+                    className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Add Input
+                  </Button>
+                )}
+                {userRole === 'rental_servicer' && (
+                  <Button
+                    onClick={() => setShowEquipmentForm(true)}
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Tractor className="h-4 w-4" />
+                    Add Equipment
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Forms */}
+        {showCropForm && (
+          <CropForm
+            onClose={() => setShowCropForm(false)}
+            onSuccess={handleCropAdded}
+          />
+        )}
+        {showInputForm && (
+          <InputForm
+            onClose={() => setShowInputForm(false)}
+            onSuccess={handleInputAdded}
+          />
+        )}
+        {showEquipmentForm && (
+          <EquipmentForm
+            onClose={() => setShowEquipmentForm(false)}
+            onSuccess={handleEquipmentAdded}
+          />
+        )}
 
         {/* Alerts */}
         {alerts.length > 0 && (

@@ -142,7 +142,7 @@ const Login = () => {
             </form>
 
             <p className="text-sm text-muted-foreground mt-2">
-              👉 Use <b>demo@gmail.com</b> / <b>123456</b>
+              👉 First create your account to login
             </p>
 
             <div className="mt-6 text-center space-y-2">
