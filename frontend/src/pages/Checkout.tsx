@@ -27,14 +27,7 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
 
   const handleInputChange = (field: string, value: string) => {
-<<<<<<< HEAD
-    setShippingAddress(prev => ({
-      ...prev,
-      [field]: value
-    }));
-=======
     setShippingAddress(prev => ({ ...prev, [field]: value }));
->>>>>>> 77b437ec6d1f401e5ca7cf24c9331e1277ea28ea
   };
 
   const handlePlaceOrder = () => {
@@ -146,44 +139,6 @@ const Checkout = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-<<<<<<< HEAD
-                  <div>
-                    <Label htmlFor="street">Street Address</Label>
-                    <Input
-                      id="street"
-                      value={shippingAddress.street}
-                      onChange={(e) => handleInputChange('street', e.target.value)}
-                      placeholder="123 Main Street"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={shippingAddress.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
-                      placeholder="City"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">State</Label>
-                    <Input
-                      id="state"
-                      value={shippingAddress.state}
-                      onChange={(e) => handleInputChange('state', e.target.value)}
-                      placeholder="State"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="pincode">Pincode</Label>
-                    <Input
-                      id="pincode"
-                      value={shippingAddress.pincode}
-                      onChange={(e) => handleInputChange('pincode', e.target.value)}
-                      placeholder="123456"
-                    />
-                  </div>
-=======
                   {['street','city','state','pincode'].map(field => (
                     <div key={field}>
                       <Label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
@@ -195,7 +150,6 @@ const Checkout = () => {
                       />
                     </div>
                   ))}
->>>>>>> 77b437ec6d1f401e5ca7cf24c9331e1277ea28ea
                 </div>
               </CardContent>
             </Card>
@@ -208,13 +162,7 @@ const Checkout = () => {
               </CardHeader>
               <CardContent>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-<<<<<<< HEAD
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment method" />
-                  </SelectTrigger>
-=======
                   <SelectTrigger><SelectValue placeholder="Select payment method" /></SelectTrigger>
->>>>>>> 77b437ec6d1f401e5ca7cf24c9331e1277ea28ea
                   <SelectContent>
                     <SelectItem value="cash_on_delivery">Cash on Delivery</SelectItem>
                     <SelectItem value="online">Online Payment</SelectItem>
