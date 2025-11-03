@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const API_BASE_URL = 'https://smart-kisan-shakthi.onrender.com/api';
+=======
+const API_BASE_URL = 'https://smart-crop-advisory-system-backend.onrender.com/api';
+>>>>>>> 77b437ec6d1f401e5ca7cf24c9331e1277ea28ea
 
 console.log('API Base URL:', API_BASE_URL);
 

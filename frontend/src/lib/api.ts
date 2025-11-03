@@ -1,6 +1,11 @@
 import axios from 'axios';
 
+<<<<<<< HEAD
 const API_BASE_URL = '/api';
+=======
+const API_BASE_URL = "https://smart-crop-advisory-system-backend.onrender.com/api";
+
+>>>>>>> 77b437ec6d1f401e5ca7cf24c9331e1277ea28ea
 
 const api = axios.create({
   baseURL: API_BASE_URL,

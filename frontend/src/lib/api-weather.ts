@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://smart-kisan-shakthi.onrender.com/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // Weather API interfaces and functions
 export interface WeatherData {
